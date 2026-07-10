@@ -3,7 +3,6 @@ templated mutex wrapper around LRUCache.h
 - ThreadSafeCache owns the LRUCache in this project
 */
 
-
 #ifndef THREADSAFECACHE_H
 #define THREADSAFECACHE_H
 

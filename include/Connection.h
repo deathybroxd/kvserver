@@ -12,7 +12,7 @@ runs the actual commands taken from protocol
 class Connection {
 public:
     // constructor
-    Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache);
+    explicit Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache);
 
     ~Connection() = default;
 

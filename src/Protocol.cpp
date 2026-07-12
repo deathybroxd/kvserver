@@ -62,6 +62,9 @@ Protocol::Request Protocol::Parse(const std::string& userInput) {
             }
             break;
         }
+
+        default:
+            break;
     }
     return req;
 }

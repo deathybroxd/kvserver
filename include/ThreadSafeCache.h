@@ -57,7 +57,7 @@ ThreadSafeCache<K, V>::ThreadSafeCache(int capacity) : m_cache(capacity) {}
 template <class K, class V>
 std::optional<V> ThreadSafeCache<K, V>::Get(const K& key) { 
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_cache.GetValue(key)
+    return m_cache.GetValue(key);
 }
 
 // set key

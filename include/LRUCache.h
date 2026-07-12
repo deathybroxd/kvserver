@@ -16,7 +16,7 @@ template <class K, class V>
 class LRUCache {
 public:
     // constructor
-    LRUCache(int capacity);
+    explicit LRUCache(int capacity);
 
     // destructor
     ~LRUCache();

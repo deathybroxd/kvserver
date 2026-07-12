@@ -3,7 +3,6 @@
 #define KVSERVER_H
 #include "ThreadSafeCache.h"
 #include "ThreadPool.h"
-#include "Connection.h"
 #include <string>
 
 struct Config {
@@ -17,10 +16,10 @@ constexpr Config DEFAULT_CONFIG;
 class KVServer {
 public:
     // default constructor
-    KVServer();
+    explicit KVServer();
 
     // overloaded constructor
-    KVServer(const Config& cfg);
+    explicit KVServer(const Config& cfg);
 
     // destructor
     ~KVServer() = default;
@@ -38,8 +37,6 @@ private:
     Config m_config;
     ThreadSafeCache<std::string, std::string> m_cache;
     ThreadPool m_threadPool;
-    int m_serverFd; // file descriptor
+    int m_serverFd = -1; // file descriptor, -1 by default since no socket has been created yet
 };
-
-
 #endif

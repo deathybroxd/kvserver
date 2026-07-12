@@ -9,11 +9,11 @@
 
 // default constructor
 KVServer::KVServer() : 
-m_config(DEFAULT_CONFIG), m_cache(m_config.capacity), m_threadPool(m_config.numThreads) {}
+m_config(DEFAULT_CONFIG), m_cache(m_config.capacity), m_threadPool(m_config.numThreads), m_wal(m_config.logFile) {}
 
 // overloaded constructor
 KVServer::KVServer(const Config& cfg) : 
-m_config(cfg), m_cache(cfg.capacity), m_threadPool(cfg.numThreads) {}
+m_config(cfg), m_cache(m_config.capacity), m_threadPool(m_config.numThreads), m_wal(m_config.logFile) {}
 
 // run()
 // main loop of the program:
@@ -44,6 +44,7 @@ void KVServer::Run() {
     bind(m_serverFd, (sockaddr*)&address, sizeof(address));
     listen(m_serverFd, 128);
 
+    m_wal.Replay(m_cache);
     // accept loop
     while(true) {
         sockaddr_in clientAddr;

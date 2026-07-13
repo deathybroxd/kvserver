@@ -4,8 +4,8 @@
 #include <unistd.h> // for close()
 
 // constructor
-Connection::Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache) : 
-m_socketFd(socketFd), m_cache(cache) {}
+Connection::Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache, WAL& wal) : 
+m_socketFd(socketFd), m_cache(cache), m_wal(wal) {}
 
 // connection handle
 void Connection::Handle() {
@@ -36,6 +36,7 @@ void Connection::Handle() {
 
                 case Protocol::Command::SET:
                     m_cache.Set(req.key, req.value);
+                    m_wal.Append("SET", req.key, req.value); // add this new kv pair to the WAL
                     result = std::nullopt;
                     break;
 
@@ -45,6 +46,7 @@ void Connection::Handle() {
 
                 case Protocol::Command::DEL:
                     result = m_cache.Remove(req.key);
+                    m_wal.Append("DEL", req.key, req.value); // add this new kv pair to the WAL
                     break;
             
                 default:

@@ -7,7 +7,7 @@ SRC = src
 TEST = tests
 
 # objs
-SERVER_OBJS = main.o KVServer.o Connection.o Protocol.o WAL.o
+SERVER_OBJS = main.o KVServer.o Connection.o Protocol.o WAL.o ThreadPool.o
 BENCHMARK_OBJS = BenchmarkClient.o Protocol.o
 TEST_OBJS = tests.o Protocol.o
 
@@ -42,17 +42,25 @@ Protocol.o: $(SRC)/Protocol.cpp include/Protocol.h
 WAL.o: $(SRC)/WAL.cpp include/WAL.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SRC)/WAL.cpp
 
+ThreadPool.o: $(SRC)/ThreadPool.cpp include/ThreadPool.h
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SRC)/ThreadPool.cpp
+
 BenchmarkClient.o: $(SRC)/BenchmarkClient.cpp include/Protocol.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SRC)/BenchmarkClient.cpp
 
 tests.o: $(TEST)/tests.cpp include/LRUCache.h include/ThreadSafeCache.h include/Protocol.h include/WAL.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(TEST)/tests.cpp
 
-val-server:
-	valgrind ./server
+clean:
+	rm -f *.o server benchmark tests
+
+run-benchmark:
+	./benchmark --host 127.0.0.1 --port 8080 --threads 10 --requests 1000
 
 val-benchmark:
-	valgrind ./benchmark
+	valgrind ./benchmark --host 127.0.0.1 --port 8080 --threads 10 --requests 1000
 
-val-tests:
-	valgrind ./tests
+start-server:	
+	./server
+
+.PHONY: all clean val-server val-benchmark val-tests

@@ -7,12 +7,13 @@ runs the actual commands taken from protocol
 
 #include "ThreadSafeCache.h"
 #include "Protocol.h"
+#include "WAL.h"
 #include <string>
 
 class Connection {
 public:
     // constructor
-    explicit Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache);
+    explicit Connection(int socketFd, ThreadSafeCache<std::string, std::string>& cache, WAL& wal);
 
     ~Connection() = default;
 
@@ -23,6 +24,7 @@ public:
 private:
     int m_socketFd; // socket file descriptor
     ThreadSafeCache<std::string, std::string>& m_cache;
+    WAL& m_wal;
 };
 
 

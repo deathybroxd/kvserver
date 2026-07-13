@@ -56,7 +56,7 @@ void KVServer::Run() {
 
         // send to threadpool
         m_threadPool.Submit([clientFd, this]() {
-            Connection conn(clientFd, m_cache);
+            Connection conn(clientFd, m_cache, m_wal);
             conn.Handle();
         });
     }

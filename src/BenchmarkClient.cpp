@@ -13,6 +13,7 @@ measures how long it takes, and reports throughput (requests/sec) and average pi
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 // example run:
 // 0           1      2         3      4    5         6  7          8
@@ -33,16 +34,18 @@ int main(int argc, char* argv[]) {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
     serverAddr.sin_addr.s_addr = inet_addr(host);
-
+    
     // begin benchmark
     std::cout << "Starting benchmark... | Host: " << host << " | Port: " << port << " | Threads: " << numThreads << " | Requests: " << numRequests << std::endl;
     using namespace std::chrono;
     auto start = high_resolution_clock::now();
 
+    std::mutex printMutex; // for printing ping properly
+
     std::vector<std::thread> threads;
     for(int i = 0; i < numThreads; ++i) {
-        // lambda for each thread to create its own socket
-        threads.emplace_back([numRequests, &serverAddr]() {
+        // lambda on each thread
+        threads.emplace_back([numRequests, &serverAddr, i, &printMutex]() {
             int socketFd = socket(AF_INET, SOCK_STREAM, 0);
             if(socketFd == -1) {
                 std::cerr << "Error: could not create socket" << std::endl;
@@ -55,8 +58,21 @@ int main(int argc, char* argv[]) {
                 return;
             }
 
+            // ping test on current thread
+            auto pingStart = high_resolution_clock::now();
+            std::string ping = "PING\n";
+            send(socketFd, ping.c_str(), ping.size(), 0);
+            char pingBuf[16];
+            recv(socketFd, pingBuf, sizeof(pingBuf), 0);
+            auto pingEnd = high_resolution_clock::now();
+            double pingMs = duration<double, std::milli>(pingEnd - pingStart).count();
+
+            { // scoped for the mutex to go out of scope and to print properly
+                std::lock_guard<std::mutex> lock(printMutex);
+                std::cout << "Thread " << i << " ping: " << pingMs << " ms" << std::endl;
+            }
+            // send N set requests
             for(int j = 0; j < numRequests; ++j) {
-                // send each request to the socket
                 std::string request = "SET key_" + std::to_string(j) + " value_" + std::to_string(j) + "\n";
                 send(socketFd, request.c_str(), request.size(), 0);
 

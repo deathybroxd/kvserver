@@ -3,8 +3,9 @@
 #include <iostream>
 
 int main() {
-    KVServer server;
+    Config cfg;
+    cfg.numThreads = 32; // this is just the number of threads on my i9-14900hx
+    KVServer server(cfg);
     server.Run();
-    std::cout << "Server running... Ctrl + C to exit" << std::endl;
     return 0;
 }

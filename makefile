@@ -24,7 +24,7 @@ benchmark: $(BENCHMARK_OBJS)
 
 # tests binary
 tests: $(TEST_OBJS)
-	$(CXX) $(CXXFLAGS) -o tests $(TEST_OBJS)
+	$(CXX) $(CXXFLAGS) -o run_tests $(TEST_OBJS)
 
 # compile rules
 main.o: main.cpp include/KVServer.h
@@ -48,17 +48,20 @@ ThreadPool.o: $(SRC)/ThreadPool.cpp include/ThreadPool.h
 BenchmarkClient.o: $(SRC)/BenchmarkClient.cpp include/Protocol.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SRC)/BenchmarkClient.cpp
 
-tests.o: $(TEST)/tests.cpp include/LRUCache.h include/ThreadSafeCache.h include/Protocol.h include/WAL.h
+tests.o: $(TEST)/tests.cpp include/ThreadSafeCache.h include/Protocol.h include/WAL.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(TEST)/tests.cpp
 
 clean:
 	rm -f *.o server benchmark tests
 
+run-tests:
+	valgrind ./run_tests
+
 run-benchmark:
-	./benchmark --host 127.0.0.1 --port 8080 --threads 10 --requests 1000
+	./benchmark --host 127.0.0.1 --port 8080 --threads 32 --requests 1000
 
 val-benchmark:
-	valgrind ./benchmark --host 127.0.0.1 --port 8080 --threads 10 --requests 1000
+	valgrind ./benchmark --host 127.0.0.1 --port 8080 --threads 32 --requests 1000
 
 start-server:	
 	./server

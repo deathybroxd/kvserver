@@ -30,6 +30,8 @@ void KVServer::Run() {
         return;
     }
 
+    std::cout << "Server running... Ctrl + C to stop" << std::endl;
+
     // set socket options
     int opt = 1; // enable option val
     setsockopt(m_serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));

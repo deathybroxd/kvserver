@@ -1,10 +1,12 @@
 /* main.cpp*/
 #include "KVServer.h"
 #include <iostream>
+#include <thread>
 
 int main() {
+    unsigned int userThreads = std::thread::hardware_concurrency();
     Config cfg;
-    cfg.numThreads = 32; // this is just the number of threads on my i9-14900hx
+    cfg.numThreads = userThreads;
     KVServer server(cfg);
     server.Run();
     return 0;

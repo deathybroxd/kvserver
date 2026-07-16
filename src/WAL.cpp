@@ -25,7 +25,15 @@ void WAL::Append(const std::string& cmd, const std::string& key, const std::stri
         localtime_r(&now_c, &tm_buf); // from ctime (c header)
         std::stringstream timestamp;
         timestamp << std::put_time(&tm_buf, "%Y-%m-%d %H:%M:%S");
-        m_file << timestamp.str() << " | " << cmd << " " << key << " " << value << std::endl;
+        m_file << timestamp.str() << " | " << cmd;
+        if(!key.empty()) { 
+            m_file << " " << key; 
+        }
+
+        if(!value.empty()) { 
+            m_file << " " << value;
+        }
+        m_file << std::endl;
     } else {
         std::cerr << "Error: " << m_filePath << " could not be opened" << std::endl;
         return;

@@ -31,7 +31,7 @@ Protocol::Request Protocol::Parse(const std::string& userInput) {
         req.cmd = it->second;
     } else {
         req.cmd = Command::ERROR;
-        req.errorMsg = "ERROR: Unknown command" + cmd;
+        req.errorMsg = "ERROR: Unknown command " + cmd;
         return req;
     }
     

@@ -17,7 +17,7 @@ public:
     // constructor
     ThreadSafeCache(int capacity);
 
-    // destructor
+    // default destructor - destructing is handled by LRUCache
     ~ThreadSafeCache() = default;
 
     // NO copy / move operators - would break the mutex
@@ -43,6 +43,9 @@ public:
 
     // isempty
     bool IsEmpty();
+
+    // clear - <!>for testing only<!> - not used in server functions
+    void Clear();
 
 private:
     LRUCache<K, V> m_cache;
@@ -94,5 +97,12 @@ bool ThreadSafeCache<K, V>::IsEmpty() {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_cache.IsEmpty();
 }
+
+// clear - TESTING ONLY
+template <class K, class V>
+void ThreadSafeCache<K, V>::Clear() {
+    m_cache.Clear();
+}
+
 
 #endif

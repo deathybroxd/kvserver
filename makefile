@@ -9,10 +9,10 @@ TEST = tests
 # objs
 SERVER_OBJS = main.o KVServer.o Connection.o Protocol.o WAL.o ThreadPool.o
 BENCHMARK_OBJS = BenchmarkClient.o Protocol.o
-TEST_OBJS = tests.o Protocol.o
+TEST_OBJS = KVServerTests.o Protocol.o WAL.o
 
 # default target - builds everything
-all: server benchmark tests
+all: server benchmark run_tests
 
 # server binary
 server: $(SERVER_OBJS)
@@ -23,8 +23,8 @@ benchmark: $(BENCHMARK_OBJS)
 	$(CXX) $(CXXFLAGS) -o benchmark $(BENCHMARK_OBJS)
 
 # tests binary
-tests: $(TEST_OBJS)
-	$(CXX) $(CXXFLAGS) -o run_tests $(TEST_OBJS)
+KVServerTests: $(TEST_OBJS)
+	$(CXX) $(CXXFLAGS) -o KVServerTests $(TEST_OBJS)
 
 # compile rules
 main.o: main.cpp include/KVServer.h
@@ -48,14 +48,14 @@ ThreadPool.o: $(SRC)/ThreadPool.cpp include/ThreadPool.h
 BenchmarkClient.o: $(SRC)/BenchmarkClient.cpp include/Protocol.h
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(SRC)/BenchmarkClient.cpp
 
-tests.o: $(TEST)/tests.cpp include/ThreadSafeCache.h include/Protocol.h include/WAL.h
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(TEST)/tests.cpp
+KVServerTests.o: $(TEST)/KVServerTests.cpp include/ThreadSafeCache.h include/Protocol.h include/WAL.h
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $(TEST)/KVServerTests.cpp
 
 clean:
-	rm -f *.o server benchmark tests
+	rm -f *.o server benchmark run_tests
 
 run-tests:
-	valgrind ./run_tests
+	valgrind ./KVServerTests
 
 run-benchmark:
 	./benchmark --host 127.0.0.1 --port 8080 --threads 32 --requests 1000
@@ -63,7 +63,7 @@ run-benchmark:
 val-benchmark:
 	valgrind ./benchmark --host 127.0.0.1 --port 8080 --threads 32 --requests 1000
 
-start-server:	
+start-server:
 	./server
 
-.PHONY: all clean val-server val-benchmark val-tests
+.PHONY: all clean start-server run-benchmark run-tests

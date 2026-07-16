@@ -36,7 +36,7 @@ void Connection::Handle() {
 
                 case Protocol::Command::SET:
                     m_cache.Set(req.key, req.value);
-                    m_wal.Append("SET", req.key, req.value); // add this new kv pair to the WAL
+                    m_wal.Append("SET", req.key, req.value);
                     result = std::nullopt;
                     break;
 
@@ -46,7 +46,7 @@ void Connection::Handle() {
 
                 case Protocol::Command::DEL:
                     result = m_cache.Remove(req.key);
-                    m_wal.Append("DEL", req.key, req.value); // add this new kv pair to the WAL
+                    m_wal.Append("DEL", req.key, req.value); // append so the cache can replay this later
                     break;
             
                 default:
